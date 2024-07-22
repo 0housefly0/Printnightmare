@@ -23,7 +23,7 @@ CVE stands for Common Vulnerabilities and Exposures. The CVE program is a system
 
 ## 2. CVSS
 CVSS (Common Vulnerability Scoring System) is a metric for scoring the severity of a CVE. It uses a series of measurements created by the National Infrastructure Advisory Council (NIAC). The current version is 3.1, which includes Base, Temporal, and Environmental sub-metrics.
-![Sub Metrics](submetrics.png)
+![Sub Metrics](images/submetrics.png)
 
 ### 2.1 Base Score Metrics
 These metrics are assigned to the CVE from the start and do not change over time. They are used to calculate the base score.
